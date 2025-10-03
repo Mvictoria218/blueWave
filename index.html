@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>blueWave</title>
+    <link rel="stylesheet" href="../static/styles/estilo.css" />
+    <link rel="icon" type="image/svg+xml" href="../static/assets/blueWave (1).svg" />
+
+  
+  </head>
+  <body>
+  <header>
+    <nav class="navbar">
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <img src="../static/assets/blueWave.svg" alt="logo">
+      <ul class="nav-links">
+        <li><p>Menu</p></li>
+        <div class="server-input">
+          <li><input
+            id="serverUrl"
+            type="url"
+            inputmode="url"
+            placeholder="URL do servidor Flask (ex.: http://SEU-IP)"
+            autocomplete="off"
+            spellcheck="false"
+          /></li>
+          <button id="connectBtn" type="button">Conectar</button>
+        </div>
+        <li><a href="#" id="topLink">Mais tocadas</a></li>
+        <li><a href="#" id="historyLink">Histórico</a></li>
+        <li><label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+            <span class="decoration"></span>
+          </label>
+        </li>
+
+      </ul>
+    </nav>
+
+    <div id="historyPanel">
+      <h3>Histórico</h3>
+      <ul id="historyList"></ul>
+    </div>
+
+    <div id="topPanel">
+      <h3>Mais Tocadas</h3>
+      <ul id="topList"></ul>
+    </div>
+
+
+
+    <div class="background"></div>
+    <div class="background"></div>
+  </header>
+</div>
+
+
+    <main>
+
+     <div class="player">
+        <div class="now-playing" id="nowPlaying">Nada tocando</div>
+        <div class="custom-player">
+          <button id="playPause">
+            <img id="playIcon" src="../static/assets/play.svg" alt="Play">
+            <img id="pauseIcon" src="../static/assets/pause.svg" alt="Pause">
+          </button>
+          <input type="range" id="progress" value="0" min="0" step="1">
+          <span id="time">0:00</span>
+
+           <!-- botão do volume -->
+            <button id="volumeBtn">
+              <img src="../static/assets/sound.svg" alt="Volume">
+            </button>
+
+            <!-- controle escondido -->
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1" style="display:none;">
+        </div>
+        <audio id="audio"></audio>
+      </div>
+    </main>
+
+    <footer>
+  <div id="status" aria-live="polite"></div>
+  <div class="song-box">
+    <ul id="songList"></ul>
+  </div>
+</footer>
+
+    <script src="app.js" defer></script>
+    <script>
+  const entradaUrlServidor = document.getElementById('serverUrl');
+  const botaoConectar = document.getElementById('connectBtn');
+  const elementoStatus = document.getElementById('status');
+  const listaMusicasEl = document.getElementById('songList');
+  const audioEl = document.getElementById('audio');
+  const tocandoAgoraEl = document.getElementById('nowPlaying');
+
+  // controles do player
+  const playPauseBtn = document.getElementById('playPause');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+  const progress = document.getElementById("progress");
+  const time = document.getElementById("time");
+  const volumeBtn = document.getElementById("volumeBtn");
+  const volumeSlider = document.getElementById("volume");
+
+  // compatibilidade: lê 'urlServidor' (novo) ou 'serverUrl' (antigo)
+  const urlSalva = localStorage.getItem('urlServidor') ?? localStorage.getItem('serverUrl');
+  if (urlSalva) entradaUrlServidor.value = urlSalva;
+
+  function juntarUrl(base, relativo) {
+    try {
+      return new URL(relativo, base).href;
+    } catch {
+      return base.replace(/\/+$/, '') + '/' + relativo.replace(/^\/+/, '');
+    }
+  }
+
+  async function buscarJSON(url) {
+    const resposta = await fetch(url);
+    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+    return resposta.json();
+  }
+
+  function definirStatus(mensagem) {
+    elementoStatus.textContent = mensagem;
+  }
+
+  botaoConectar.addEventListener('click', async () => {
+    const base = entradaUrlServidor.value.trim().replace(/\/$/, '');
+    if (!base) { definirStatus('Informe a URL do servidor.'); return; }
+
+    localStorage.setItem('urlServidor', base);
+    localStorage.setItem('serverUrl', base);
+
+    definirStatus('Conectando…');
+    try {
+      const saude = await buscarJSON(juntarUrl(base, '/api/saude'));
+      definirStatus(`Conectado. ${saude.count} músicas disponíveis.`);
+      const musicas = await buscarJSON(juntarUrl(base, '/api/musicas'));
+      renderizarMusicas(base, musicas);
+    } catch (erro) {
+      definirStatus('Falha ao conectar. Verifique a URL e a rede.');
+      console.error(erro);
+    }
+  });
+
+  function renderizarMusicas(base, musicas) {
+    listaMusicasEl.innerHTML = '';
+    if (!musicas.length) {
+      listaMusicasEl.innerHTML = '<li>Nenhuma música encontrada no servidor.</li>';
+      return;
+    }
+
+    musicas.forEach(musica => {
+      const li = document.createElement('li');
+
+      const blocoMeta = document.createElement('div');
+      blocoMeta.className = 'meta';
+
+      const tituloEl = document.createElement('div');
+      tituloEl.className = 'title';
+      tituloEl.textContent = musica.title || '(Sem título)';
+
+      const artistaEl = document.createElement('div');
+      artistaEl.className = 'artist';
+      artistaEl.textContent = musica.artist || 'Desconhecido';
+
+      blocoMeta.appendChild(tituloEl);
+      blocoMeta.appendChild(artistaEl);
+
+      const botaoTocar = document.createElement('button');
+      botaoTocar.textContent = 'Tocar';
+      botaoTocar.addEventListener('click', () => tocarMusica(base, musica));
+
+      li.appendChild(blocoMeta);
+      li.appendChild(botaoTocar);
+      listaMusicasEl.appendChild(li);
+    });
+  }
+
+  // --- HISTÓRICO E MAIS TOCADAS --- //
+  const historyListEl = document.getElementById('historyList');
+  let history = [];
+
+  const topList = document.getElementById('topList');
+  let contagemTocadas = {};
+
+  function tocarMusica(base, musica) {
+    const url = musica.url?.startsWith('http') ? musica.url : juntarUrl(base, musica.url);
+    audioEl.src = url;
+    audioEl.play().catch(console.error);
+    tocandoAgoraEl.textContent = `Tocando: ${musica.title} — ${musica.artist}`;
+
+    // histórico
+    history.push(musica);
+    renderizarHistorico();
+
+    // mais tocadas
+    const key = musica.title || musica.url;
+    contagemTocadas[key] = (contagemTocadas[key] || 0) + 1;
+  }
+
+  function renderizarHistorico() {
+    historyListEl.innerHTML = '';
+    history.slice().reverse().forEach(musica => {
+      const li = document.createElement('li');
+      li.textContent = `${musica.title} — ${musica.artist}`;
+      historyListEl.appendChild(li);
+    });
+  }
+
+  function renderizarTopMusicas() {
+    topList.innerHTML = '';
+    const entradas = Object.entries(contagemTocadas);
+    if (!entradas.length) {
+      topList.innerHTML = '<li>Nenhuma música tocada ainda.</li>';
+      return;
+    }
+    entradas.sort((a, b) => b[1] - a[1]);
+    entradas.forEach(([titulo, vezes]) => {
+      const li = document.createElement('li');
+      li.textContent = `${titulo} — ${vezes}x`;
+      topList.appendChild(li);
+    });
+  }
+
+  // --- MENU HAMBÚRGUER --- //
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // --- LINKS DO MENU (ajuste feito) --- //
+  const historyLink = document.getElementById('historyLink');
+  const historyPanel = document.getElementById('historyPanel');
+  const topLink = document.getElementById('topLink');
+  const topPanel = document.getElementById('topPanel');
+
+  historyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    const ativo = historyPanel.classList.contains('active');
+    historyPanel.classList.remove('active');
+    topPanel.classList.remove('active');
+    if (!ativo) {
+      historyPanel.classList.add('active');
+      renderizarHistorico();
+    }
+  });
+
+  topLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    const ativo = topPanel.classList.contains('active');
+    historyPanel.classList.remove('active');
+    topPanel.classList.remove('active');
+    if (!ativo) {
+      topPanel.classList.add('active');
+      renderizarTopMusicas();
+    }
+  });
+
+
+  // --- PLAYER --- //
+playPauseBtn.addEventListener('click', () => {
+  if (audioEl.paused) {
+    audioEl.play().catch(console.error);
+  } else {
+    audioEl.pause();
+  }
+});
+
+// atualiza ícones sempre que o estado do áudio mudar
+audioEl.addEventListener("play", () => {
+  playIcon.style.display = "none";
+  pauseIcon.style.display = "inline";
+});
+
+audioEl.addEventListener("pause", () => {
+  playIcon.style.display = "inline";
+  pauseIcon.style.display = "none";
+});
+
+
+  audioEl.addEventListener("timeupdate", () => {
+    progress.max = audioEl.duration;
+    progress.value = audioEl.currentTime;
+    let minutes = Math.floor(audioEl.currentTime / 60);
+    let seconds = Math.floor(audioEl.currentTime % 60).toString().padStart(2, "0");
+    time.textContent = `${minutes}:${seconds}`;
+  });
+
+  progress.addEventListener("input", () => {
+    audioEl.currentTime = progress.value;
+  });
+
+  volumeBtn.addEventListener('click', () => {
+    volumeSlider.style.display = (volumeSlider.style.display === 'none' || volumeSlider.style.display === '') ? 'block' : 'none';
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    audioEl.volume = volumeSlider.value;
+  });
+
+  // --- DARK MODE --- //
+  const darkModeToggle = document.getElementById('darkModeToggle');
+
+  if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+    darkModeToggle.checked = true;
+  }
+
+  darkModeToggle.addEventListener('change', () => {
+    if (darkModeToggle.checked) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('darkMode', 'enabled');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('darkMode', 'disabled');
+    }
+  });
+</script>
+
+
+</body>
+
+</html>

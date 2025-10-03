@@ -1,0 +1,658 @@
+@import url('https://fonts.googleapis.com/css2?family=Genos:ital,wght@0,100..900;1,100..900&display=swap');
+* {
+    box-sizing: border-box;
+}
+:root{
+  --font-one: 'Genos', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f5efeb;
+  color: #b9d5e5;
+  }
+
+.background {
+  width: 80%;             /* cobre toda a largura */
+  height: 800px;            /* altura da faixa superior */
+  position: fixed;
+  top: 10px;
+  left: -20px;
+  background-image: url("../assets/fundo.svg");
+  background-position: top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: -1;            /* fica atrás do conteúdo */
+  display: flex;            /* para alinhar conteúdo dentro */
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;        /* centraliza horizontalmente */
+}
+
+
+header img{
+  width: 160px;
+  position: relative;
+  left: 10px;
+  }
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  position: relative;
+  top: 5px;
+  color: #6b89cc;
+  }
+
+    /* Ícone hambúrguer (3 linhas) */
+.menu-toggle {
+  width: 30px;
+  height: 22px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.menu-toggle span {
+  position: absolute;
+  height: 4px;
+  width: 100%;
+  background: #c8d9e6;
+  border-radius: 2px;
+  left: 0;
+  transition: 0.3s;
+}
+
+.menu-toggle span:nth-child(1) {
+  top: 1;
+}
+.menu-toggle span:nth-child(2) {
+  top: 9px;
+}
+.menu-toggle span:nth-child(3) {
+  bottom: 0;
+}
+
+/* Animação para X */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 9px;
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg);
+  bottom: 9px;
+}
+
+.server-input input{
+  border: 5px solid #8aa4c2;
+  border-radius: 8px;
+  position: relative;
+  top: -15px;
+}
+
+#connectBtn {
+  background-color: #6b89cc;
+  position: relative;
+  top: -10px;
+}
+
+.nav-links {
+  list-style: none;
+  display: none;
+  font-size: 20px;
+  font-family: var(--font-one);
+  flex-direction: column;
+  background: #e7e6e5;
+  position: absolute;  
+  top: 60px;           
+  left: 20px;          
+  width: 200px;
+  padding: 10px;
+  margin: 0;
+  z-index: 1000;       
+}
+
+.nav-links li {
+margin: 10px 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #6b89cc;
+}
+
+.nav-links li a:hover {
+  color: #6b89cc;
+}
+
+.server-input button {
+  font-family: var(--font-one);
+  font-weight: bold;
+  width: 70px;
+  color: #f5efeb;
+  cursor: pointer;
+  border: 2px solid #6b89cc;
+  border-radius: 10px;
+}
+
+.nav-links.active {
+  display: flex;
+}
+
+.player {
+  position: absolute;
+  bottom: 100px;   /* ajusta a altura que você quiser */
+  right: 170px;  /* distância da borda direita */
+}
+
+#nowPlaying{
+  width: 400px;      /* largura fixa */
+  height: 90px;      /* altura fixa */
+  background-color: #8aa4c2;
+  border-radius: 8px; /* cantos arredondados */
+  text-align: left; /* centraliza o texto */
+  padding-left: 15px;
+  padding-right: 10px;
+  font-size: 20px;
+  font-family: var(--font-one);
+  padding-top: 10px;
+  position: relative;
+  color: #f5efeb;
+  bottom: 20px;
+}
+
+.custom-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #8aa4c2;
+  padding: 10px;
+  border-radius: 15px;
+  width: 400px;
+}
+
+#playIcon, #pauseIcon {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+/* Esconde o ícone de pause por padrão */
+#pauseIcon {
+    display: none;
+}
+
+#progress{
+  width: 300px;   /* aumenta o tamanho horizontal */
+  height: 8px;   
+}
+
+button, 
+button:focus,
+button:active {
+  outline: none;   /* tira o contorno */
+  border: none;    /* tira a borda padrão */
+  background: none; /* opcional, caso queira só o ícone */
+}
+
+.custom-player input[type="range"] {
+  flex: 1;
+  accent-color: #99bcc7; /* cor da barra no Chrome */
+}
+
+#time {
+  width: 50px;
+  text-align: center;
+  font-family: var(--font-one);
+  position: relative;
+  top: -90px;
+  left: 20px;
+  color: #f5efeb;
+  font-size: 25px;
+}
+
+#volumeBtn img {
+  width: 55px;
+  height: 55px;
+  cursor: pointer;
+  position: fixed;
+  right: 180px;
+  bottom: 110px;
+}
+
+#volume {
+  display: none;
+  position: absolute;
+  right: -60px;   /* coloca à direita do botão */
+  bottom: 40px;
+  transform: rotate(-90deg); /* deixa em pé */
+  width: 100px;   /* altura da barra (pois está rotacionada) */
+}
+
+.song-box {
+  background: #8aa4c2;        /* cor de fundo da caixa */
+  padding: 20px;
+  position: fixed;        /* fica fixo na tela */
+  top: 20%;               /* mais ou menos da metade pra cima */
+  right: 170px;
+  border-radius: 12px;
+  width: 400px;               /* largura da caixa */
+  margin: 20px auto;        /* centraliza no footer */
+  color: #837d7d;                /* cor do texto */
+}
+
+#songList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;          /* limite de altura */
+  overflow-y: auto;           /* ativa scroll se passar do limite */
+}
+
+#songList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #c8d9e6;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-family: var(--font-one);
+  border-radius: 8px;
+  color: #837d7d;
+}
+
+#songList li .meta {
+  display: flex;
+  flex-direction: column;
+}
+
+#songList li button {
+  background: #6b89cc;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  color: #f5efeb;
+  cursor: pointer;
+  font-family: var(--font-one);
+  font-weight: bold;
+}
+
+#songList li button:hover {
+  background: #20262c;
+}
+
+#historyPanel {
+  font-family: var(--font-one);
+  position: fixed;
+  top: 0;
+  right: -300px;  /* começa fora da tela */
+  width: 300px;
+  height: 100%;
+  color: #8aa4c2;
+  background: #ffffffcc;
+  border-left: 2px solid #99bcc7;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+#historyList li{
+  margin-bottom: 10px;
+}
+
+#topList li{
+  margin-bottom: 10px;
+}
+
+
+#historyPanel.active {
+  right: 0;  /* aparece */
+}
+
+#historyPanel h3 {
+  font-family: var(--font-one);
+  margin-top: 0;
+  color: #8aa4c2;
+  font-family: var(--font-one);
+}
+
+#topPanel {
+  font-family: var(--font-one);
+  position: fixed;
+  top: 0;
+  right: -300px; /* começa fora da tela */
+  width: 300px;
+  height: 100%;
+  color: #8aa4c2;
+  margin-bottom: 10px;
+  background: #f5efeb;
+  border-left: 2px solid #99bcc7;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 2000;
+  overflow-y: auto;
+}
+
+#topPanel.active {
+  right: 0; /* aparece */
+}
+
+/* From Uiverse.io by juanpabl0svn */ 
+/* The switch - the box around the slider */
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+  cursor: pointer;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  --background: #20262c;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background);
+  transition: 0.5s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 50%;
+  left: 10%;
+  bottom: 15%;
+  box-shadow: inset 8px -4px 0px 0px #ececd9, -4px 1px 4px 0px #dadada;
+  background: var(--background);
+  transition: 0.5s;
+}
+
+.decoration {
+  position: absolute;
+  content: "";
+  height: 2px;
+  width: 2px;
+  border-radius: 50%;
+  right: 20%;
+  top: 15%;
+  background: #e5f041e6;
+  backdrop-filter: blur(10px);
+  transition: all 0.5s;
+  box-shadow: -7px 10px 0 #e5f041e6, 8px 15px 0 #e5f041e6, -17px 1px 0 #e5f041e6,
+    -20px 10px 0 #e5f041e6, -7px 23px 0 #e5f041e6, -15px 25px 0 #e5f041e6;
+}
+
+input:checked ~ .decoration {
+  transform: translateX(-20px);
+  width: 10px;
+  height: 10px;
+  background: white;
+  box-shadow: -12px 0 0 white, -6px 0 0 1.6px white, 5px 15px 0 1px white,
+    1px 17px 0 white, 10px 17px 0 white;
+}
+
+input:checked + .slider {
+  background-color: #5494de;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+  box-shadow: inset 15px -4px 0px 15px #efdf2b, 0 0 10px 0px #efdf2b;
+}
+
+
+.nav-links .switch {
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+body.dark-mode {
+  background: #615c5c;
+
+}
+
+body.dark-mode .background {
+  width: 80%;             /* cobre toda a largura */
+  height: 800px;            /* altura da faixa superior */
+  position: fixed;
+  top: 10px;
+  left: -20px;
+  background-image: url("../assets/fundo_escuro.svg");
+  background-position: top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: -1;            /* fica atrás do conteúdo */
+  display: flex;            /* para alinhar conteúdo dentro */
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;    
+}
+
+body.dark-mode .nav-links a {
+  color: #122943;
+}
+
+body.dark-mode #historyPanel,
+body.dark-mode #topPanel {
+  background: #1e1e1ecc;
+  border-left: 2px solid #444;
+}
+
+body.dark-mode button {
+  background: #333;
+  color: #f1f1f1;
+  border: 1px solid #666;
+}
+ 
+body.dark-mode #nowPlaying, 
+body.dark-mode .song-box {
+  background: #122943;
+  color: #f1f1f1;
+}
+
+body.dark-mode .custom-player {
+  background: #122943;
+}
+
+body.dark-mode .custom-player input[type="range"] {
+  flex: 1;
+  accent-color: #ffffff; /* cor da barra no Chrome */
+}
+
+/* Troca as imagens dos ícones no modo escuro */
+body.dark-mode #playIcon {
+  content: url("../assets/play_escuro.svg");
+  background: transparent;
+}
+
+body.dark-mode #pauseIcon {
+  content: url("../assets/pause_escuro.svg");
+  background: transparent;
+}
+
+body.dark-mode #volumeBtn img {
+  content: url("../assets/volume_escuro.svg");
+}
+
+body.dark-mode button, 
+button:focus,
+button:active {
+  outline: none;   /* tira o contorno */
+  border: none;    /* tira a borda padrão */
+  background: none; /* opcional, caso queira só o ícone */
+}
+
+body.dark-mode #songList li {
+  background: #647395;
+  color: #f5efeb;
+}
+
+body.dark-mode #songList li button {
+  background: #6b89cc;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  color: #f5efeb;
+  cursor: pointer;
+  font-family: var(--font-one);
+  font-weight: bold;
+}
+
+body.dark-mode #songList li button:hover {
+  background: #20262c;
+}
+
+body.dark-mode .nav-links {
+  background: #aca2a2;
+}
+body.dark-mode .nav-links p {
+  color: #122943;
+}
+
+
+@media (max-width: 768px) {
+  header img {
+    width: 120px;
+  }
+  
+
+  .background{
+    width: 110%;
+    height: 80%;
+    right: 0;
+  }
+
+  .nav-links {
+    top: 50px;
+    left: 0;
+    width: 50%;
+    font-size: 18px;
+
+  }
+
+  .player {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+  }
+
+  #nowPlaying {
+    font-size: 20px !important;
+    width: 300px;
+    margin: 0 auto 10px auto;
+  }
+
+  .custom-player {
+    width: 90%;
+    justify-content: space-between;
+  }
+
+  #progress {
+    width: 120px;
+  }
+
+  #volumeBtn img {
+    position: static;
+    width: 40px;
+    height: 40px;
+  }
+
+  #volume {
+    right: 15px;
+    bottom: 22px;
+    transform: rotate(0deg);
+  }
+
+  .song-box {
+    position: static;
+    width: 90%;
+    margin: 20px auto;
+  }
+
+  #historyPanel,
+  #topPanel {
+    width: 70%;
+  }
+}
+
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  background{
+    width: 50px;
+
+  }
+
+  header img {
+    width: 100px;
+  }
+
+  #nowPlaying {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .custom-player {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .server-input input {
+    width: 180px;
+  }
+
+  #progress {
+    width: 100%;
+  }
+
+  #time {
+    top: 0;
+    left: 0;
+    position: static;
+  }
+
+  .song-box {
+    padding: 10px;
+  }
+
+  #songList li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  #songList li button {
+    width: 100%;
+    text-align: center;
+  }
+}
